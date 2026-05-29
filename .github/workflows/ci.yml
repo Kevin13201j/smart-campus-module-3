@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - qa
+      - dev
+      - main
+  push:
+    branches:
+      - dev
+      - qa
+      - main
+
+jobs:
+  validate:
+    name: Validate Repository
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validate Docker Compose
+        run: docker compose config
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform format check
+        run: terraform fmt -check -recursive infra/terraform
+
+      - name: Terraform validate QA
+        working-directory: infra/terraform/qa
+        run: terraform init -backend=false && terraform validate
+
+      - name: Terraform validate Production
+        working-directory: infra/terraform/prod
+        run: terraform init -backend=false && terraform validate
+
