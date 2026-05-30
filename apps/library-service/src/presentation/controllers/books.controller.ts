@@ -1,3 +1,9 @@
+import { UseGuards } from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../../auth/guards/roles.guard';
+import { Roles } from '../../auth/decorators/roles.decorator';
+import { UserRole } from '../../domain/enums/user-role.enum';
 import {
   Body,
   Controller,
@@ -19,6 +25,8 @@ import { Book } from '../../domain/entities/book.entity';
 import { BookLoan } from '../../domain/entities/book-loan.entity';
 import { BookLoanStatus } from '../../domain/enums/book-loan-status.enum';
 
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('books')
 export class BooksController {
   constructor(
@@ -30,11 +38,13 @@ export class BooksController {
   ) {}
 
   @Get()
+  @Roles(UserRole.ADMIN, UserRole.LIBRARIAN, UserRole.STUDENT)
   findAll() {
     return this.bookRepository.find();
   }
 
   @Get('search')
+  @Roles(UserRole.ADMIN, UserRole.LIBRARIAN, UserRole.STUDENT)
   search(@Query('q') query: string) {
     if (!query) {
       return this.bookRepository.find();
@@ -51,6 +61,7 @@ export class BooksController {
   }
 
   @Get(':id')
+  @Roles(UserRole.ADMIN, UserRole.LIBRARIAN, UserRole.STUDENT)
   async findOne(@Param('id') id: string) {
     const book = await this.bookRepository.findOne({ where: { id } });
 
@@ -62,6 +73,7 @@ export class BooksController {
   }
 
   @Post()
+  @Roles(UserRole.ADMIN, UserRole.LIBRARIAN)
   create(@Body() createBookDto: CreateBookDto) {
     const book = this.bookRepository.create({
       ...createBookDto,
@@ -72,6 +84,7 @@ export class BooksController {
   }
 
   @Patch(':id')
+  @Roles(UserRole.ADMIN, UserRole.LIBRARIAN)
   async update(@Param('id') id: string, @Body() updateBookDto: UpdateBookDto) {
     const book = await this.bookRepository.findOne({ where: { id } });
 
@@ -92,6 +105,7 @@ export class BooksController {
   }
 
   @Delete(':id')
+  @Roles(UserRole.ADMIN)
   async remove(@Param('id') id: string) {
     const book = await this.bookRepository.findOne({ where: { id } });
 
@@ -107,6 +121,7 @@ export class BooksController {
   }
 
   @Post(':id/loan')
+  @Roles(UserRole.STUDENT, UserRole.LIBRARIAN, UserRole.ADMIN)
   async loanBook(@Param('id') id: string, @Body() loanBookDto: LoanBookDto) {
     const book = await this.bookRepository.findOne({ where: { id } });
 
@@ -132,6 +147,7 @@ export class BooksController {
   }
 
   @Post(':id/return')
+  @Roles(UserRole.STUDENT, UserRole.LIBRARIAN, UserRole.ADMIN)
   async returnBook(@Param('id') id: string, @Body() loanBookDto: LoanBookDto) {
     const book = await this.bookRepository.findOne({ where: { id } });
 

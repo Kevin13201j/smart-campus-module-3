@@ -20,7 +20,9 @@ async function bootstrap() {
     .setTitle('Library Service API')
     .setDescription('Smart Campus UCE - Library microservice documentation')
     .setVersion('1.0')
+    .addBearerAuth()
     .addTag('Books')
+    .addTag('Auth')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

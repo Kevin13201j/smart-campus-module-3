@@ -4,6 +4,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Book } from './domain/entities/book.entity';
 import { BooksController } from './presentation/controllers/books.controller';
 import { BookLoan } from './domain/entities/book-loan.entity';
+import { AuthModule } from './auth/auth.module';
+import { User } from './domain/entities/user.entity';
 
 @Module({
   imports: [
@@ -25,7 +27,8 @@ import { BookLoan } from './domain/entities/book-loan.entity';
       }),
     }),
 
-    TypeOrmModule.forFeature([Book, BookLoan]),
+    TypeOrmModule.forFeature([Book, BookLoan, User]), 
+    AuthModule,
   ],
   controllers: [BooksController],
 })
