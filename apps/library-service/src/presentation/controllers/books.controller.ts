@@ -1,3 +1,5 @@
+import { BookStatus } from '../../domain/enums/book-status.enum';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UseGuards } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
@@ -25,6 +27,8 @@ import { Book } from '../../domain/entities/book.entity';
 import { BookLoan } from '../../domain/entities/book-loan.entity';
 import { BookLoanStatus } from '../../domain/enums/book-loan-status.enum';
 
+
+@ApiTags('Books')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('books')
@@ -37,12 +41,14 @@ export class BooksController {
     private readonly bookLoanRepository: Repository<BookLoan>,
   ) {}
 
+  @ApiOperation({ summary: 'Get all books' })
   @Get()
   @Roles(UserRole.ADMIN, UserRole.LIBRARIAN, UserRole.STUDENT)
   findAll() {
     return this.bookRepository.find();
   }
 
+  @ApiOperation({ summary: 'Search books by title, author, isbn or category' })
   @Get('search')
   @Roles(UserRole.ADMIN, UserRole.LIBRARIAN, UserRole.STUDENT)
   search(@Query('q') query: string) {
@@ -60,6 +66,7 @@ export class BooksController {
     });
   }
 
+  @ApiOperation({ summary: 'Get book by id' })
   @Get(':id')
   @Roles(UserRole.ADMIN, UserRole.LIBRARIAN, UserRole.STUDENT)
   async findOne(@Param('id') id: string) {
@@ -72,6 +79,7 @@ export class BooksController {
     return book;
   }
 
+  @ApiOperation({ summary: 'Create a new book' })
   @Post()
   @Roles(UserRole.ADMIN, UserRole.LIBRARIAN)
   create(@Body() createBookDto: CreateBookDto) {
@@ -83,6 +91,7 @@ export class BooksController {
     return this.bookRepository.save(book);
   }
 
+  @ApiOperation({ summary: 'Update book by id' })
   @Patch(':id')
   @Roles(UserRole.ADMIN, UserRole.LIBRARIAN)
   async update(@Param('id') id: string, @Body() updateBookDto: UpdateBookDto) {
@@ -113,13 +122,16 @@ export class BooksController {
       throw new NotFoundException('Book not found');
     }
 
-    await this.bookRepository.remove(book);
+    book.status = BookStatus.INACTIVE;
+
+    await this.bookRepository.save(book);
 
     return {
-      message: 'Book deleted successfully',
+      message: 'Book disabled successfully',
     };
   }
 
+  @ApiOperation({ summary: 'Loan a book to a student' })
   @Post(':id/loan')
   @Roles(UserRole.STUDENT, UserRole.LIBRARIAN, UserRole.ADMIN)
   async loanBook(@Param('id') id: string, @Body() loanBookDto: LoanBookDto) {
@@ -146,6 +158,7 @@ export class BooksController {
     return this.bookLoanRepository.save(loan);
   }
 
+  @ApiOperation({ summary: 'Return a borrowed book' })
   @Post(':id/return')
   @Roles(UserRole.STUDENT, UserRole.LIBRARIAN, UserRole.ADMIN)
   async returnBook(@Param('id') id: string, @Body() loanBookDto: LoanBookDto) {

@@ -6,6 +6,7 @@ import { BooksController } from './presentation/controllers/books.controller';
 import { BookLoan } from './domain/entities/book-loan.entity';
 import { AuthModule } from './auth/auth.module';
 import { User } from './domain/entities/user.entity';
+import { HealthController } from './health.controller';
 
 @Module({
   imports: [
@@ -30,6 +31,6 @@ import { User } from './domain/entities/user.entity';
     TypeOrmModule.forFeature([Book, BookLoan, User]), 
     AuthModule,
   ],
-  controllers: [BooksController],
+  controllers: [BooksController, HealthController],
 })
 export class AppModule {}
