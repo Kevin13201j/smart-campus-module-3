@@ -47,6 +47,38 @@ services:
       - "3001:3001"
     depends_on:
       - library-db
+  classroom-reservation-db:
+    image: postgres:16
+    container_name: classroom-reservation-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: classroom_reservation_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - classroom_reservation_data:/var/lib/postgresql/data
+  
+  classroom-reservation-service:
+    build:
+      context: ./apps/classroom-reservation-service
+    container_name: smart-campus-classroom-reservation-service
+    restart: always
+    environment:
+      PORT: 3002
+      DATABASE_HOST: classroom-reservation-db
+      DATABASE_PORT: 5432
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: postgres
+      DATABASE_NAME: classroom_reservation_db
+      JWT_SECRET: smart-campus-classroom-secret
+      JWT_EXPIRES_IN: 8h
+      CORS_ORIGIN: http://localhost:3000
+    ports:
+      - "3002:3002"
+    depends_on:
+      - classroom-reservation-db
 
   redis:
     image: redis:7-alpine
@@ -73,4 +105,4 @@ volumes:
   postgres-data:
   redis-data:
   library_db_data:
-
+  classroom_reservation_data:

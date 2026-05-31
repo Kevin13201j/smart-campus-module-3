@@ -2,9 +2,17 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ThrottlerModule } from '@nestjs/throttler';
+
 import { databaseConfig } from './config/database.config';
+
 import { Classroom } from './domain/entities/classroom.entity';
 import { Reservation } from './domain/entities/reservation.entity';
+
+import { ClassroomController } from './presentation/controllers/classroom.controller';
+import { ReservationController } from './presentation/controllers/reservation.controller';
+
+import { ClassroomService } from './application/use-cases/classroom.service';
+import { ReservationService } from './application/use-cases/reservation.service';
 
 @Module({
   imports: [
@@ -22,5 +30,7 @@ import { Reservation } from './domain/entities/reservation.entity';
       },
     ]),
   ],
+  controllers: [ClassroomController, ReservationController],
+  providers: [ClassroomService, ReservationService],
 })
 export class AppModule {}
