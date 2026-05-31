@@ -1,6 +1,7 @@
 {
   "name": "smart-campus-module-3",
   "version": "1.0.0",
+  "packageManager": "npm@10.0.0",
   "description": "Distributed Programming final project for Module 3: Smart Campus Services.",
   "main": "index.js",
   "directories": {

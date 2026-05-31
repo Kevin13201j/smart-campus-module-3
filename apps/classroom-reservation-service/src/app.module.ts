@@ -1,3 +1,11 @@
+
+import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
+import { APP_GUARD } from '@nestjs/core';
+
+import { JwtStrategy } from './presentation/strategies/jwt.strategy';
+import { JwtAuthGuard } from './presentation/guards/jwt-auth.guard';
+import { RolesGuard } from './presentation/guards/roles.guard';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -28,9 +36,24 @@ import { ReservationService } from './application/use-cases/reservation.service'
         ttl: 60000,
         limit: 20,
       },
-    ]),
+    ]),   
+    PassportModule,
+    JwtModule.register({}),
   ],
   controllers: [ClassroomController, ReservationController],
-  providers: [ClassroomService, ReservationService],
+  
+  providers: [
+  ClassroomService,
+  ReservationService,
+  JwtStrategy,
+  {
+    provide: APP_GUARD,
+    useClass: JwtAuthGuard,
+  },
+  {
+    provide: APP_GUARD,
+    useClass: RolesGuard,
+  },
+],
 })
 export class AppModule {}

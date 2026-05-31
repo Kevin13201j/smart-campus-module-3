@@ -12,6 +12,8 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ClassroomService } from '../../application/use-cases/classroom.service';
 import { CreateClassroomDto } from '../../application/dto/create-classroom.dto';
 import { UpdateClassroomDto } from '../../application/dto/update-classroom.dto';
+import { Roles } from '../decorators/roles.decorator';
+import { UserRole } from '../../domain/enums/user-role.enum';
 
 @ApiTags('Classrooms')
 @ApiBearerAuth()
@@ -35,11 +37,14 @@ export class ClassroomController {
   }
 
   @Post()
+  @Roles(UserRole.ADMIN)
   create(@Body() createClassroomDto: CreateClassroomDto) {
     return this.classroomService.create(createClassroomDto);
   }
 
+    
   @Patch(':id')
+  @Roles(UserRole.ADMIN)
   update(
     @Param('id') id: string,
     @Body() updateClassroomDto: UpdateClassroomDto,
@@ -48,6 +53,7 @@ export class ClassroomController {
   }
 
   @Delete(':id')
+  @Roles(UserRole.ADMIN)
   remove(@Param('id') id: string) {
     return this.classroomService.remove(id);
   }

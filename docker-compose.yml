@@ -47,6 +47,7 @@ services:
       - "3001:3001"
     depends_on:
       - library-db
+
   classroom-reservation-db:
     image: postgres:16
     container_name: classroom-reservation-db
@@ -59,7 +60,7 @@ services:
       - "5434:5432"
     volumes:
       - classroom_reservation_data:/var/lib/postgresql/data
-  
+
   classroom-reservation-service:
     build:
       context: ./apps/classroom-reservation-service
@@ -79,7 +80,7 @@ services:
       - "3002:3002"
     depends_on:
       - classroom-reservation-db
-
+  
   redis:
     image: redis:7-alpine
     container_name: smart-campus-redis
