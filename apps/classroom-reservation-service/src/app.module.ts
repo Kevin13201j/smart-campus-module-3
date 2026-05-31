@@ -23,6 +23,7 @@ import { ClassroomService } from './application/use-cases/classroom.service';
 import { ReservationService } from './application/use-cases/reservation.service';
 
 import { ReservationGateway } from './infrastructure/websocket/reservation.gateway';
+import { ReservationEventsProducer } from './infrastructure/kafka/reservation-events.producer';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { ReservationGateway } from './infrastructure/websocket/reservation.gatew
   providers: [
   ClassroomService,
   ReservationService,
+  ReservationEventsProducer,
   ReservationGateway,
   JwtStrategy,
   {

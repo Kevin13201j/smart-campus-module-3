@@ -12,7 +12,7 @@ import { Reservation } from '../../domain/entities/reservation.entity';
 })
 export class ReservationGateway {
   @WebSocketServer()
-  server: Server;
+  server!: Server;
 
   notifyReservationCreated(reservation: Reservation) {
     this.server.emit('reservation.created', reservation);

@@ -13,6 +13,7 @@ import { ClassroomStatus } from '../../domain/enums/classroom-status.enum';
 import { CreateReservationDto } from '../dto/create-reservation.dto';
 import { UpdateReservationDto } from '../dto/update-reservation.dto';
 import { ReservationGateway } from '../../infrastructure/websocket/reservation.gateway';
+import { ReservationEventsProducer } from '../../infrastructure/kafka/reservation-events.producer';
 
 @Injectable()
 export class ReservationService {
@@ -24,6 +25,7 @@ export class ReservationService {
     private readonly classroomRepository: Repository<Classroom>,
 
     private readonly reservationGateway: ReservationGateway,
+    private readonly reservationEventsProducer: ReservationEventsProducer,
   ) {}
 
   async findAll(): Promise<Reservation[]> {
@@ -73,6 +75,7 @@ export class ReservationService {
     const savedReservation = await this.reservationRepository.save(reservation);
 
     this.reservationGateway.notifyReservationCreated(savedReservation);
+    await this.reservationEventsProducer.emitReservationCreated(savedReservation);
 
     return savedReservation;
   }
@@ -117,11 +120,10 @@ export class ReservationService {
       throw new BadRequestException('Only pending reservations can be approved');
     }
 
-    reservation.status = ReservationStatus.APPROVED;
-
     const savedReservation = await this.reservationRepository.save(reservation);
 
     this.reservationGateway.notifyReservationApproved(savedReservation);
+    await this.reservationEventsProducer.emitReservationApproved(savedReservation);
 
     return savedReservation;
   }
@@ -133,11 +135,10 @@ export class ReservationService {
       throw new BadRequestException('Only pending reservations can be rejected');
     }
 
-    reservation.status = ReservationStatus.REJECTED;
-
     const savedReservation = await this.reservationRepository.save(reservation);
 
     this.reservationGateway.notifyReservationRejected(savedReservation);
+    await this.reservationEventsProducer.emitReservationRejected(savedReservation);
 
     return savedReservation;
   }
@@ -152,15 +153,14 @@ export class ReservationService {
       throw new BadRequestException('This reservation cannot be cancelled');
     }
 
-    reservation.status = ReservationStatus.CANCELLED;
-
     const savedReservation = await this.reservationRepository.save(reservation);
 
     this.reservationGateway.notifyReservationCancelled(savedReservation);
+    await this.reservationEventsProducer.emitReservationCancelled(savedReservation);
 
     return savedReservation;
   }
-
+  
   private async validateClassroomAvailability(classroomId: string): Promise<void> {
     const classroom = await this.classroomRepository.findOne({
       where: { id: classroomId },
