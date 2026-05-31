@@ -22,6 +22,8 @@ import { ReservationController } from './presentation/controllers/reservation.co
 import { ClassroomService } from './application/use-cases/classroom.service';
 import { ReservationService } from './application/use-cases/reservation.service';
 
+import { ReservationGateway } from './infrastructure/websocket/reservation.gateway';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -45,6 +47,7 @@ import { ReservationService } from './application/use-cases/reservation.service'
   providers: [
   ClassroomService,
   ReservationService,
+  ReservationGateway,
   JwtStrategy,
   {
     provide: APP_GUARD,

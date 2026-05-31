@@ -12,6 +12,7 @@ import { ReservationStatus } from '../../domain/enums/reservation-status.enum';
 import { ClassroomStatus } from '../../domain/enums/classroom-status.enum';
 import { CreateReservationDto } from '../dto/create-reservation.dto';
 import { UpdateReservationDto } from '../dto/update-reservation.dto';
+import { ReservationGateway } from '../../infrastructure/websocket/reservation.gateway';
 
 @Injectable()
 export class ReservationService {
@@ -21,6 +22,8 @@ export class ReservationService {
 
     @InjectRepository(Classroom)
     private readonly classroomRepository: Repository<Classroom>,
+
+    private readonly reservationGateway: ReservationGateway,
   ) {}
 
   async findAll(): Promise<Reservation[]> {
@@ -67,7 +70,11 @@ export class ReservationService {
       status: ReservationStatus.PENDING,
     });
 
-    return this.reservationRepository.save(reservation);
+    const savedReservation = await this.reservationRepository.save(reservation);
+
+    this.reservationGateway.notifyReservationCreated(savedReservation);
+
+    return savedReservation;
   }
 
   async update(id: string, updateReservationDto: UpdateReservationDto): Promise<Reservation> {
@@ -112,7 +119,11 @@ export class ReservationService {
 
     reservation.status = ReservationStatus.APPROVED;
 
-    return this.reservationRepository.save(reservation);
+    const savedReservation = await this.reservationRepository.save(reservation);
+
+    this.reservationGateway.notifyReservationApproved(savedReservation);
+
+    return savedReservation;
   }
 
   async reject(id: string): Promise<Reservation> {
@@ -124,7 +135,11 @@ export class ReservationService {
 
     reservation.status = ReservationStatus.REJECTED;
 
-    return this.reservationRepository.save(reservation);
+    const savedReservation = await this.reservationRepository.save(reservation);
+
+    this.reservationGateway.notifyReservationRejected(savedReservation);
+
+    return savedReservation;
   }
 
   async cancel(id: string): Promise<Reservation> {
@@ -139,7 +154,11 @@ export class ReservationService {
 
     reservation.status = ReservationStatus.CANCELLED;
 
-    return this.reservationRepository.save(reservation);
+    const savedReservation = await this.reservationRepository.save(reservation);
+
+    this.reservationGateway.notifyReservationCancelled(savedReservation);
+
+    return savedReservation;
   }
 
   private async validateClassroomAvailability(classroomId: string): Promise<void> {
