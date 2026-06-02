@@ -1,0 +1,51 @@
+name: Classroom Reservation Service CI
+
+on:
+  push:
+    branches:
+      - feature/classroom-reservation-service
+      - develop
+      - qa
+      - main
+    paths:
+      - "apps/classroom-reservation-service/**"
+      - "package.json"
+      - "package-lock.json"
+      - "turbo.json"
+      - ".github/workflows/classroom-reservation-ci.yml"
+
+  pull_request:
+    branches:
+      - develop
+      - qa
+      - main
+    paths:
+      - "apps/classroom-reservation-service/**"
+      - "package.json"
+      - "package-lock.json"
+      - "turbo.json"
+      - ".github/workflows/classroom-reservation-ci.yml"
+
+jobs:
+  classroom-reservation-ci:
+    name: Build and Test Classroom Reservation Service
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npx turbo run test --filter=classroom-reservation-service
+
+      - name: Build service
+        run: npx turbo run build --filter=classroom-reservation-service
