@@ -1,98 +1,360 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Classroom Reservation Service
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## Overview
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+The Classroom Reservation Service is part of the Smart Campus UCE distributed platform.
 
-## Description
+This microservice is responsible for managing academic classrooms and reservations while preventing scheduling conflicts. It provides secure APIs for students, professors, and administrators and supports future integrations with notification, QR access, and space availability services.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+---
 
-## Project setup
+## Features
 
-```bash
-$ npm install
+### Classroom Management
+
+* Create classrooms
+* Update classrooms
+* Delete classrooms
+* Get classroom information
+* Get available classrooms
+
+### Reservation Management
+
+* Create reservations
+* Update reservations
+* Cancel reservations
+* Approve reservations
+* Reject reservations
+* Retrieve reservation information
+
+### Business Rules
+
+* Prevent overlapping reservations
+* Validate classroom availability
+* Role-based access control
+* JWT authentication
+* Event publication through Kafka
+* Real-time updates through WebSocket
+
+---
+
+## Architecture
+
+### Architectural Patterns
+
+* Microservices Architecture
+* Event-Driven Architecture
+* Hexagonal Architecture
+* Layered Architecture
+* Database per Service Pattern
+
+### Communication
+
+| Type             | Technology |
+| ---------------- | ---------- |
+| REST API         | NestJS     |
+| Real-Time Events | WebSocket  |
+| Event Streaming  | Kafka      |
+
+---
+
+## Technology Stack
+
+### Backend
+
+* NestJS
+* TypeScript
+* PostgreSQL
+* TypeORM
+
+### Security
+
+* JWT Authentication
+* RBAC Authorization
+* Validation Pipes
+* Guards
+* CORS
+* Rate Limiting
+
+### DevOps
+
+* Docker
+* Docker Compose
+* GitHub Actions
+* Turborepo
+
+### Monitoring
+
+* Health Checks
+* Prometheus (Future Integration)
+* Grafana (Future Integration)
+
+---
+
+## Project Structure
+
+```text
+src/
+
+├── application
+│   ├── dto
+│   └── use-cases
+│
+├── domain
+│   ├── entities
+│   ├── enums
+│   └── repositories
+│
+├── infrastructure
+│   ├── database
+│   ├── kafka
+│   ├── websocket
+│   └── repositories
+│
+├── presentation
+│   ├── controllers
+│   ├── guards
+│   ├── decorators
+│   └── strategies
+│
+└── config
 ```
 
-## Compile and run the project
+---
 
-```bash
-# development
-$ npm run start
+## Database
 
-# watch mode
-$ npm run start:dev
+Database Name:
 
-# production mode
-$ npm run start:prod
+```text
+classroom_reservation_db
 ```
 
-## Run tests
+### Tables
 
-```bash
-# unit tests
-$ npm run test
+#### classrooms
 
-# e2e tests
-$ npm run test:e2e
+| Column     | Type      |
+| ---------- | --------- |
+| id         | UUID      |
+| name       | VARCHAR   |
+| building   | VARCHAR   |
+| floor      | INTEGER   |
+| capacity   | INTEGER   |
+| type       | VARCHAR   |
+| status     | ENUM      |
+| created_at | TIMESTAMP |
+| updated_at | TIMESTAMP |
 
-# test coverage
-$ npm run test:cov
+#### reservations
+
+| Column           | Type      |
+| ---------------- | --------- |
+| id               | UUID      |
+| classroom_id     | UUID      |
+| user_id          | UUID      |
+| reservation_date | DATE      |
+| start_time       | TIME      |
+| end_time         | TIME      |
+| purpose          | TEXT      |
+| status           | ENUM      |
+| created_at       | TIMESTAMP |
+| updated_at       | TIMESTAMP |
+
+---
+
+## User Roles
+
+### ADMIN
+
+* Manage classrooms
+* Approve reservations
+* Reject reservations
+* Cancel reservations
+
+### PROFESSOR
+
+* Create reservations
+* Update reservations
+* Approve reservations
+* Reject reservations
+
+### STUDENT
+
+* Create reservations
+* Cancel reservations
+
+---
+
+## API Endpoints
+
+### Classrooms
+
+```http
+GET /classrooms
+GET /classrooms/:id
+POST /classrooms
+PATCH /classrooms/:id
+DELETE /classrooms/:id
+GET /classrooms/available
 ```
 
-## Deployment
+### Reservations
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+```http
+GET /reservations
+GET /reservations/:id
+POST /reservations
+PATCH /reservations/:id
+DELETE /reservations/:id
+POST /reservations/:id/approve
+POST /reservations/:id/reject
+POST /reservations/:id/cancel
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+---
 
-## Resources
+## Kafka Events
 
-Check out a few resources that may come in handy when working with NestJS:
+Published Events:
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+```text
+reservation.created
+reservation.approved
+reservation.rejected
+reservation.cancelled
+```
 
-## Support
+Future Consumers:
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```text
+notification-service
+qr-access-service
+space-availability-service
+```
 
-## Stay in touch
+---
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## WebSocket Events
 
-## License
+```text
+reservation.created
+reservation.approved
+reservation.rejected
+reservation.cancelled
+```
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+---
+
+## Environment Variables
+
+```env
+PORT=3002
+
+DATABASE_HOST=localhost
+DATABASE_PORT=5434
+DATABASE_USER=postgres
+DATABASE_PASSWORD=postgres
+DATABASE_NAME=classroom_reservation_db
+
+JWT_SECRET=smart-campus-classroom-secret
+JWT_EXPIRES_IN=8h
+
+KAFKA_BROKER=localhost:9092
+
+CORS_ORIGIN=http://localhost:3000
+```
+
+---
+
+## Local Development
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Run application:
+
+```bash
+npm run start:dev
+```
+
+Swagger:
+
+```text
+http://localhost:3002/api/docs
+```
+
+Health Check:
+
+```text
+http://localhost:3002/health
+```
+
+---
+
+## Docker
+
+Build image:
+
+```bash
+docker build -t classroom-reservation-service .
+```
+
+Run containers:
+
+```bash
+docker compose up -d
+```
+
+---
+
+## Testing
+
+Run unit tests:
+
+```bash
+npm run test
+```
+
+Run integration tests:
+
+```bash
+npm run test:e2e
+```
+
+---
+
+## CI/CD
+
+GitHub Actions pipeline includes:
+
+* Dependency installation
+* Build validation
+* Unit testing
+* Pull Request validation
+
+---
+
+## Future Enhancements
+
+* Notification Service Integration
+* QR Access Integration
+* Space Availability Integration
+* Prometheus Metrics
+* Grafana Dashboards
+* RabbitMQ Integration
+* GraphQL API
+* gRPC Communication
+
+---
+
+## Authors
+
+Smart Campus UCE
+
+Distributed Programming Course
+
+Universidad Central del Ecuador
