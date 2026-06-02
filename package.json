@@ -23,6 +23,9 @@
   },
   "homepage": "https://github.com/Kevin13201j/smart-campus-module-3#readme",
   "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "jest": "^30.4.2",
+    "ts-jest": "^29.4.11",
     "turbo": "^2.9.16"
   }
 }
