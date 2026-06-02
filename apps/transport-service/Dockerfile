@@ -24,6 +24,6 @@ RUN npm install --omit=dev && npm cache clean --force
 
 COPY --from=build /usr/src/app/dist ./dist
 
-EXPOSE 3003
+EXPOSE 3004
 
 CMD ["node", "dist/src/main.js"]
