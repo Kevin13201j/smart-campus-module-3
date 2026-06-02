@@ -28,7 +28,7 @@ services:
       - "5433:5432"
     volumes:
       - library_db_data:/var/lib/postgresql/data
-  
+
   library-service:
     build:
       context: ./apps/library-service
@@ -87,10 +87,45 @@ services:
       classroom-reservation-db:
         condition: service_healthy
       kafka:
-          condition: service_healthy
+        condition: service_healthy
       mqtt:
         condition: service_healthy
-  
+
+  campus-incident-db:
+    image: postgres:16
+    container_name: campus-incident-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: campus_incidents_db
+    ports:
+      - "5435:5432"
+    volumes:
+      - campus_incident_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d campus_incidents_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  campus-incident-service:
+    image: ddiego24/campus-incident-service:qa
+    container_name: smart-campus-incident-service
+    restart: always
+    environment:
+      PORT: 3001
+      DB_HOST: campus-incident-db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: campus_incidents_db
+    ports:
+      - "3005:3001"
+    depends_on:
+      campus-incident-db:
+        condition: service_healthy
+
   redis:
     image: redis:7-alpine
     container_name: smart-campus-redis
@@ -116,7 +151,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
-  
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.6.1
     container_name: smart-campus-zookeeper
@@ -152,3 +187,4 @@ volumes:
   redis-data:
   library_db_data:
   classroom_reservation_data:
+  campus_incident_data:
