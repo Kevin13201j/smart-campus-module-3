@@ -1,13 +1,21 @@
 {
   "name": "smart-campus-module-3",
   "version": "1.0.0",
+  "packageManager": "npm@10.0.0",
   "description": "Distributed Programming final project for Module 3: Smart Campus Services.",
   "main": "index.js",
   "directories": {
     "doc": "docs"
   },
+
+  "workspaces": [
+    "apps/*"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "dev": "turbo run dev"
   },
   "repository": {
     "type": "git",
@@ -22,6 +30,9 @@
   },
   "homepage": "https://github.com/Kevin13201j/smart-campus-module-3#readme",
   "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "jest": "^30.4.2",
+    "ts-jest": "^29.4.11",
     "turbo": "^2.9.16"
   }
 }
